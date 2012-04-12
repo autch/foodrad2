@@ -1,0 +1,112 @@
+<!DOCTYPE html> 
+<html> 
+  <head> 
+    <title>食品の放射能データ検索もどき（実験）</title> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0-rc.1/jquery.mobile-1.1.0-rc.1.min.css" />
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.1.0-rc.1/jquery.mobile-1.1.0-rc.1.min.js"></script>
+    <script src="foodrad.js"></script>
+    <style>
+      #detailPage table th { text-align: left; }
+      #detailPage table td.num { text-align: right; }
+      #resultPage .result-container { padding-left: 4px; }
+</style>
+  </head> 
+  <body> 
+    <div id="mainPage" data-role="page">
+      <div data-role="header">
+	<h1>食品の放射能データ検索もどき（実験）</h1>
+      </div><!-- /header -->
+      <div data-role="content">	
+	<p><a href="http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/">http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/</a> の reversed.csv ファイルを朝 9 時に取得して使っています。</p>
+
+	<form method="post" action="#resultPage" data-ajax="false" onsubmit="return on_submit();">
+	  <fieldset>
+	    <legend>検索条件</legend>
+	    <div data-role="fieldcontain">
+	      <label for="home_pref" class="ui-hidden-accessible">都道府県</label>
+              <input id="home_pref" name="home_pref" size="20" value="" placeholder="都道府県" />
+	      <select name="select-home_pref" id="select-home_pref" onchange="$('#home_pref').val($(this).val())">
+		<option value="">すべて</option>
+	      </select>
+	    </div>
+	    <div data-role="fieldcontain">
+	      <label for="category" class="ui-hidden-accessible">食品カテゴリ</label>
+              <input id="category" name="category" size="20" value="" placeholder="食品カテゴリ" />
+	      <select name="select-category" id="select-category" onchange="onchange_category($(this).val())">
+		<option value="">すべて</option>
+	      </select>
+	    </div>
+	    <div data-role="fieldcontain">
+	      <label for="item_name" class="ui-hidden-accessible">品目</label>
+	      <input id="item_name" name="item_name" size="20" value="" placeholder="品目" />
+	      <select name="select-name" id="select-item_name" onchange="$('#item_name').val($(this).val())">
+		<option value="">すべて</option>
+	      </select>
+	    </div>
+	    <div data-role="fieldcontain">
+	      <label for="cs_total">Cs-134+137 <input id="cs_total" name="cs_total" value="100" /> Bq/kg 以上</label>
+	    </div>
+	  </fieldset>
+	  <input type="submit" value="検索" data-theme="b"/>
+	</form>
+	
+      </div><!-- /content -->
+    </div><!-- /page -->
+
+
+    <div id="resultPage" data-role="page">
+      <div data-role="header">
+	<a href="#mainPage" data-icon="back" data-direction="reverse" class="ui-btn-left jqm-back">戻る</a>
+	<h1>検索結果</h1>
+      </div><!-- /header -->
+
+      <div data-role="content">	
+	<ul data-role="listview" class="dynamic-list" id="result">
+	</ul>
+      </div>
+    </div>
+
+    <div id="detailPage" data-role="page">
+      <div data-role="header">
+	<a href="#resultPage" data-icon="back" data-direction="reverse" class="ui-btn-left jqm-back">戻る</a>
+	<h1>検索結果詳細</h1>
+      </div><!-- /header -->
+
+      <div data-role="content">
+	<table>
+	  <tr><th scope="row">No</th><td id="detail-0"></td></tr>
+	  <tr><th scope="row">報告自治体</th><td id="detail-1"></td></tr>
+	  <tr><th scope="row">実施主体</th><td><span id="detail-2"></span> <span id="detail-3"></span></td></tr>
+	  <tr><th scope="row">産地</th><td><span id="detail-4"></span> <span id="detail-5"></span> <span id="detail-6"></span></td></tr>
+	  <tr><th scope="row">非流通品/流通品</th><td id="detail-7"></td></tr>
+	  <tr><th scope="row">食品カテゴリ</th><td id="detail-8"></td></tr>
+	  <tr><th scope="row">品目</th><td id="detail-9"></td></tr>
+	  <tr><th scope="row">品目委細</th><td id="detail-10"></td></tr>
+	  <tr><th scope="row">検査機関</th><td id="detail-11"></td></tr>
+	  <tr><th scope="row">検査法 [Ge/NaI]</th><td id="detail-12"></td><tr>
+	  <tr><th scope="row">採取日/購入日</th><td id="detail-13"></td></tr>
+	  <tr><th scope="row">結果判明日</th><td id="detail-14"></td></tr>
+	  <tr><th scope="row">I131</th><td class="num"><span id="detail-15"></span> Bq/kg</td></tr>
+	  <tr><th scope="row">Cs134</th><td class="num"><span id="detail-16"></span> Bq/kg</td></tr>
+	  <tr><th scope="row">Cs137</th><td class="num"><span id="detail-17"></span> Bq/kg</td></tr>
+	  <tr><th scope="row">Cs 合計</th><td class="num"><span id="detail-18"></span> Bq/kg</td></tr>
+	</table>
+	<p>不検出は &lt; を付けた数値で表しています。この場合の &lt; の右の数値は検出限界値です。</p>
+      </div>
+    </div>
+<script>
+    jQuery(function() {
+	jQuery.mobile.showPageLoadingMsg();
+	jQuery('#submit').attr('disabled', "disabled");
+    });
+
+    jQuery(document).delegate('#mainPage', 'pageinit', function() {
+	get_area();
+	get_categories();
+    });
+</script>
+  </body>
+</html>
