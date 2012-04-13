@@ -1,4 +1,4 @@
-# foodrad
+# foodrad2
 
 厚生労働省発表の「食品中の放射性物質の検査結果について」を [三重大の奥村晴彦教授が CSV 化したもの](http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/) をローカルファイルとして参照し、iPhone/Android での利用に適した検索画面を提供します。
 
