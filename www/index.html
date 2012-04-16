@@ -12,7 +12,9 @@
       #detailPage table th { text-align: left; }
       #detailPage table td.num { text-align: right; }
       #resultPage .result-container { padding-left: 4px; }
-</style>
+      #resultPage .lv2 { border-left: 8px solid #ffc; }
+      #resultPage .lv3 { border-left: 8px solid #fc0; }
+    </style>
   </head> 
   <body> 
     <div id="mainPage" data-role="page">
@@ -20,37 +22,47 @@
 	<h1>食品の放射能データ検索もどき（実験）</h1>
       </div><!-- /header -->
       <div data-role="content">	
-	<p><a href="http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/">http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/</a> の reversed.csv ファイルを朝 9 時に取得して使っています。</p>
+	<p><a href="http://www.mhlw.go.jp/">厚生労働省発表</a>の「<a href="http://www.mhlw.go.jp/stf/houdou/2r98520000025sai.html">食品中の放射性物質の検査結果について</a>」を<a href="http://oku.edu.mie-u.ac.jp/~okumura/">三重大学の奥村晴彦教授</a>が <a href="http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/">CSV 化されたもの</a> から、<a href="reversed.csv">reversed.csv</a> ファイルを朝 9 時に取得して使っています。</p>
+        <p>検索結果に疑問を抱いたときは <a href="http://oku.edu.mie-u.ac.jp/food/">オリジナル版</a>を参照してください。</p>
 
 	<form method="post" action="#resultPage" data-ajax="false" onsubmit="return on_submit();">
 	  <fieldset>
-	    <legend>検索条件</legend>
-	    <div data-role="fieldcontain">
-	      <label for="home_pref" class="ui-hidden-accessible">都道府県</label>
-              <input id="home_pref" name="home_pref" size="20" value="" placeholder="都道府県" />
-	      <select name="select-home_pref" id="select-home_pref" onchange="$('#home_pref').val($(this).val())">
-		<option value="">すべて</option>
-	      </select>
-	    </div>
-	    <div data-role="fieldcontain">
-	      <label for="category" class="ui-hidden-accessible">食品カテゴリ</label>
-              <input id="category" name="category" size="20" value="" placeholder="食品カテゴリ" />
-	      <select name="select-category" id="select-category" onchange="onchange_category($(this).val())">
-		<option value="">すべて</option>
-	      </select>
-	    </div>
-	    <div data-role="fieldcontain">
-	      <label for="item_name" class="ui-hidden-accessible">品目</label>
-	      <input id="item_name" name="item_name" size="20" value="" placeholder="品目" />
-	      <select name="select-name" id="select-item_name" onchange="$('#item_name').val($(this).val())">
-		<option value="">すべて</option>
-	      </select>
-	    </div>
-	    <div data-role="fieldcontain">
-	      <label for="cs_total">Cs-134+137 <input id="cs_total" name="cs_total" value="100" /> Bq/kg 以上</label>
-	    </div>
+	    <ul data-role="listview" data-inset="true">
+	      <li data-role="list-divider">
+		<legend>検索条件</legend>
+	      </li>
+	      <li>
+		<label for="home_pref" class="ui-hidden-accessible">都道府県</label>
+		<input id="home_pref" name="home_pref" size="20" value="" placeholder="都道府県" />
+		<select name="select-home_pref" id="select-home_pref" onchange="$('#home_pref').val($(this).val())">
+		  <option value="">すべて</option>
+		</select>
+	      </li>
+	      <li>
+		<label for="category" class="ui-hidden-accessible">食品カテゴリ</label>
+		<input id="category" name="category" size="20" value="" placeholder="食品カテゴリ" />
+		<select name="select-category" id="select-category" onchange="onchange_category()">
+		  <option value="">すべて</option>
+		</select>
+	      </li>
+	      <li>
+		<label for="item_name" class="ui-hidden-accessible">品目</label>
+		<input id="item_name" name="item_name" size="20" value="しいたけ|シイタケ" placeholder="品目" />
+		<select name="select-name" id="select-item_name" onchange="$('#item_name').val($(this).val())">
+		  <option value="">すべて</option>
+		</select>
+	      </li>
+	      <!--li>
+		<label for="I131">I-131 <input id="I131" name="I131" value="0" /> Bq/kg 以上</label>
+	      </li-->
+	      <li>
+		<label for="cs_total">Cs-134+137 <input id="cs_total" name="cs_total" value="100" /> Bq/kg 以上</label>
+	      </li>
+	      <li>
+		<input type="submit" value="検索" data-theme="b"/>
+	      </li>
+	    </ul>
 	  </fieldset>
-	  <input type="submit" value="検索" data-theme="b"/>
 	</form>
 	
       </div><!-- /content -->
@@ -98,15 +110,15 @@
       </div>
     </div>
 <script>
-    jQuery(function() {
-	jQuery.mobile.showPageLoadingMsg();
-	jQuery('#submit').attr('disabled', "disabled");
-    });
+jQuery(function() {
+    jQuery.mobile.showPageLoadingMsg();
+    jQuery('#submit').attr('disabled', "disabled");
+});
 
-    jQuery(document).delegate('#mainPage', 'pageinit', function() {
-	get_area();
-	get_categories();
-    });
+jQuery(document).delegate('#mainPage', 'pageinit', function() {
+    get_area();
+    get_categories();
+});
 </script>
   </body>
 </html>

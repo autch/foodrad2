@@ -1,7 +1,4 @@
 
-// { カテゴリ: [品名, 品名, ...] }
-var categories = {
-};
 var load_ok = [];
 
 function check_done_loading(sym) {
@@ -34,15 +31,15 @@ function get_area() {
 
 function get_categories() {
     jQuery.getJSON('categories.js', function(result) {
-	categories = result;
 	var sel = jQuery('#select-category');
 	sel.empty();
 	sel.append(jQuery("<option>").text("すべて").val(""));
-	for(var key in categories) {
-	    var item = categories[key];
+	for(var key in result) {
+	    var item = result[key];
 	    var opt = jQuery("<option>");
 	    var caption = key + " (" + item['count'] + ")";
-		
+
+            opt.data("items", item['items']);		
 	    opt.text(caption).val(key);
 	    sel.append(opt);
 	}
@@ -51,14 +48,16 @@ function get_categories() {
     });
 }
 
-function onchange_category(cat_name) {
-    jQuery('#category').val(cat_name);
-
+function onchange_category() {
+    var opt_sel = jQuery("#select-category option:selected");
     var sel = jQuery('#select-item_name');
-    var cat = categories[cat_name]['items'];
+    var cat = opt_sel.data("items");
 
+    jQuery('#category').val(opt_sel.val());
     sel.empty();
     sel.append(jQuery("<option>").text("すべて").val(""));
+
+    if(!cat) return;
     for(var i = 0; i < cat.length; i++) {
 	var opt = jQuery("<option>");
 	
@@ -78,12 +77,14 @@ function on_submit() {
 	"area": jQuery('#home_pref').val(),
 	"category": jQuery('#category').val(),
 	"name": jQuery('#item_name').val(),
-	"Cs": jQuery('#cs_total').val()
+	"Cs": jQuery('#cs_total').val(),
+	"I131": jQuery('#I131').val()
     }, function(result) {
 	var ul = jQuery("#result");
 	ul.empty();
 
 	if(result == null || result.length == 0) {
+            jQuery("#resultPage h1").text("ヒットなし");
 	    jQuery("<li>").text("見つかりませんでした").appendTo(ul);
 	    jQuery.mobile.changePage(jQuery('#resultPage'));
 	    jQuery('ul.dynamic-list').listview('refresh');
@@ -114,16 +115,11 @@ function on_submit() {
 		color_val = item[17];
 	    }
 	    if(color_val != null) {
-		var color;
 		if(color_val >= 500) {
-		    color = "#fc0";
+                    jQuery("div", tmpl_item).addClass("lv3");
 		} else if(color_val >= 100) {
-		    color = "#ffc";
-		} else {
-		    color = null;
+                    jQuery("div", tmpl_item).addClass("lv2");
 		}
-		if(color)
-		    jQuery("div", tmpl_item).css("border-left", "8px solid " + color);
 	    }
 
 	    jQuery.data(anchor, "item", item);	    
@@ -134,6 +130,7 @@ function on_submit() {
 
 	    tmpl_item.appendTo(ul);
 	}
+	jQuery("#resultPage h1").text(result.length +  "件ヒット");
 	jQuery.mobile.changePage(jQuery('#resultPage'));
 	jQuery('ul.dynamic-list').listview('refresh');
 	jQuery.mobile.hidePageLoadingMsg();

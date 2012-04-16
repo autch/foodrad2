@@ -32,6 +32,14 @@ if(!empty($_REQUEST['category']))
     $where[] = function($row) { return preg_match(make_pcre_pattern($_REQUEST['category']), $row[8]); };
 if(!empty($_REQUEST['name']))
     $where[] = function($row) { return preg_match(make_pcre_pattern($_REQUEST['name']), $row[9]); };
+if(isset($_REQUEST['I131']))
+{
+    $i131 = floatval($_REQUEST['I131']);
+    if($i131 > 0) {
+        $where[] = function($row) use($i131) { return (strstr($row[15], "<") === FALSE)
+                                    && (floatval($row[15]) >= $i131); };
+    }
+}
 if(isset($_REQUEST['Cs']))
 {
     $cs_total = floatval($_REQUEST['Cs']);
