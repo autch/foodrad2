@@ -147,3 +147,13 @@ function showDetail(event) {
 	}
     }
 }
+
+function get_timestamp() {
+    jQuery.get('timestamp.txt', function(data){ 
+	var span = jQuery('#timestamp');
+	var d = new Date(data);
+	var text = d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 " +
+                   d.getHours() + "時" + d.getMinutes() + "分";
+	span.text(text);
+    });
+}

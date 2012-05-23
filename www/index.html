@@ -22,7 +22,9 @@
 	<h1>食品の放射能データ検索もどき（実験）</h1>
       </div><!-- /header -->
       <div data-role="content">	
-	<p><a href="http://www.mhlw.go.jp/">厚生労働省発表</a>の「<a href="http://www.mhlw.go.jp/stf/houdou/2r98520000025sai.html">食品中の放射性物質の検査結果について</a>」を<a href="http://oku.edu.mie-u.ac.jp/~okumura/">三重大学の奥村晴彦教授</a>が <a href="http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/">CSV 化されたもの</a> から、<a href="reversed.csv">reversed.csv</a> ファイルを朝 9 時に取得して使っています。</p>
+	<p><a href="http://www.mhlw.go.jp/">厚生労働省発表</a>の「<a href="http://www.mhlw.go.jp/stf/houdou/2r98520000025sai.html">食品中の放射性物質の検査結果について</a>」を<a href="http://oku.edu.mie-u.ac.jp/~okumura/">三重大学の奥村晴彦教授</a>が <a href="http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/">CSV 化されたもの</a> から、<a href="reversed.csv">reversed.csv</a> ファイルを午前と午後の 9 時に取得して使っています。</p>
+	<p><span id="timestamp"></span>更新の <a href="reversed.csv">reversed.csv</a> を使用しています。</p>
+
         <p>検索結果に疑問を抱いたときは <a href="http://oku.edu.mie-u.ac.jp/food/">オリジナル版</a>を参照してください。</p>
 
 	<form method="post" action="#resultPage" data-ajax="false" onsubmit="return on_submit();">
@@ -113,6 +115,7 @@
 jQuery(function() {
     jQuery.mobile.showPageLoadingMsg();
     jQuery('#submit').attr('disabled', "disabled");
+    get_timestamp();
 });
 
 jQuery(document).delegate('#mainPage', 'pageinit', function() {
