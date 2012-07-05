@@ -49,6 +49,26 @@ if(isset($_REQUEST['Cs']))
     }
 }
 
+$r_limit = 50;
+if(isset($_REQUEST['r_limit']))
+{
+    $r_limit = intval($_REQUEST['r_limit']);
+    if($r_limit < 50)
+    {
+        $r_limit = 50;
+    }
+}
+
+$r_offset = 0;
+if(isset($_REQUEST['r_offset']))
+{
+    $r_offset = intval($_REQUEST['r_offset']);
+    if($r_offset < 0)
+    {
+        $r_offset = 0;
+    }
+}
+
 $callback = get_jsonp_callback();
 if(($fp = fopen(CSV_PATH, "rb")) !== FALSE)
 {
@@ -56,7 +76,8 @@ if(($fp = fopen(CSV_PATH, "rb")) !== FALSE)
 
     print jsonp_begin($callback);
     print "[\n";
-    while(($row = fgetcsv($fp, 1024)) !== FALSE)
+    $item_count = 0;
+    while(($row = fgetcsv($fp, 1024)) !== FALSE && $r_limit > 0)
     {
         $t = TRUE;
         foreach($where as $fn)
@@ -65,8 +86,13 @@ if(($fp = fopen(CSV_PATH, "rb")) !== FALSE)
         }
         if($t === FALSE) continue;
 
-        print json_encode($row, JSON_HEX_APOS | JSON_HEX_QUOT);
-        print ",\n";
+        if($item_count >= $r_offset && $r_limit > 0)
+        {
+            print json_encode($row, JSON_HEX_APOS | JSON_HEX_QUOT);
+            print ",\n";
+            $r_limit--;
+        }
+        $item_count++;
     }
     print "]";
     print jsonp_end($callback);
