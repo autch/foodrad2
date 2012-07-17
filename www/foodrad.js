@@ -92,7 +92,7 @@ function on_submit() {
 	    return;
 	}
 
-	for(var i in result) {
+	for(var i = 0; i < result.length; i++) {
 	    var item = result[i];
 	    var template = "<li><a><div class=\"result-container\"><h3><small/></h3></div></a></li>";
 	    var tmpl_item = jQuery(template);
@@ -116,20 +116,20 @@ function on_submit() {
 	    }
 	    if(color_val != null) {
 		if(color_val >= 500) {
-                    jQuery("div", tmpl_item).addClass("lv3");
+                    container.addClass("lv3");
 		} else if(color_val >= 100) {
-                    jQuery("div", tmpl_item).addClass("lv2");
+                    container.addClass("lv2");
 		}
 	    }
 
-	    jQuery.data(anchor, "item", item);	    
+	    anchor.data("item", item);
 	    anchor.attr("href", "#detailPage")
-	    anchor.click(item, function(event) {
-		showDetail(event);
-	    });
 
 	    tmpl_item.appendTo(ul);
 	}
+	jQuery(ul).delegate("a", "click", function(event) {
+	    showDetail(event);	    
+	});
 	jQuery("#resultPage h1").text(result.length +  "件ヒット");
 	jQuery.mobile.changePage(jQuery('#resultPage'));
 	jQuery('ul.dynamic-list').listview('refresh');
@@ -139,7 +139,7 @@ function on_submit() {
 }
 
 function showDetail(event) {
-    var data = event.data;
+    var data = jQuery(event.currentTarget).data("item");
     for(var key in data) {
 	var td = jQuery("#detail-" + key);
 	if(td && td.length > 0) {
