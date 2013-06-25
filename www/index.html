@@ -4,11 +4,12 @@
     <title>食品の放射能データ検索もどき（実験）</title> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0-rc.1/jquery.mobile-1.1.0-rc.1.min.css" />
-    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.1.0-rc.1/jquery.mobile-1.1.0-rc.1.min.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
     <script src="foodrad.js"></script>
     <style>
+      #detailPage table { width: 100%; }
       #detailPage table th { text-align: left; }
       #detailPage table td.num { text-align: right; }
       #resultPage .result-container { padding-left: 4px; }
@@ -23,7 +24,7 @@
       </div><!-- /header -->
       <div data-role="content">	
 	<p><a href="http://www.mhlw.go.jp/">厚生労働省発表</a>の「<a href="http://www.mhlw.go.jp/stf/houdou/2r98520000025sai.html">食品中の放射性物質の検査結果について</a>」を<a href="http://oku.edu.mie-u.ac.jp/~okumura/">三重大学の奥村晴彦教授</a>が <a href="http://oku.edu.mie-u.ac.jp/~okumura/stat/data/mhlw/">CSV 化されたもの</a> から、<a href="reversed.csv">reversed.csv</a> ファイルを午前と午後の 9 時に取得して使っています。</p>
-	<p><span id="timestamp"></span>更新の <a href="reversed.csv">reversed.csv</a> を使用しています。</p>
+	<p><span id="timestamp">（取得中...）</span>更新の <a href="reversed.csv">reversed.csv</a> を使用しています。</p>
 
         <p>検索結果に疑問を抱いたときは <a href="http://oku.edu.mie-u.ac.jp/food/">オリジナル版</a>を参照してください。</p>
 
@@ -90,7 +91,8 @@
       </div><!-- /header -->
 
       <div data-role="content">
-	<table>
+	<table class="table-stroke">
+          <tbody>
 	  <tr><th scope="row">No</th><td id="detail-0"></td></tr>
 	  <tr><th scope="row">報告自治体</th><td id="detail-1"></td></tr>
 	  <tr><th scope="row">実施主体</th><td><span id="detail-2"></span> <span id="detail-3"></span></td></tr>
@@ -107,6 +109,7 @@
 	  <tr><th scope="row">Cs134</th><td class="num"><span id="detail-16"></span> Bq/kg</td></tr>
 	  <tr><th scope="row">Cs137</th><td class="num"><span id="detail-17"></span> Bq/kg</td></tr>
 	  <tr><th scope="row">Cs 合計</th><td class="num"><span id="detail-18"></span> Bq/kg</td></tr>
+          </tbody>
 	</table>
 	<p>不検出は &lt; を付けた数値で表しています。この場合の &lt; の右の数値は検出限界値です。</p>
       </div>

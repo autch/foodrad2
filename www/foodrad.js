@@ -129,6 +129,7 @@ function on_submit() {
 	}
 	jQuery(ul).delegate("a", "click", function(event) {
 	    showDetail(event);	    
+	    jQuery('#detailPage').trigger("create");
 	});
 	jQuery("#resultPage h1").text(result.length +  "件ヒット");
 	jQuery.mobile.changePage(jQuery('#resultPage'));
