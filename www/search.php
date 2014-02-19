@@ -88,6 +88,11 @@ if(($fp = fopen(CSV_PATH, "rb")) !== FALSE)
 
         if($item_count >= $r_offset && $r_limit > 0)
         {
+            $row["with_separate_cs"] = (count($row) == 19);
+            $color_val = $row["with_separate_cs"] ? $row[18] : $row[17];
+            if($color_val >= 500)      $row["class"] = "lv3";
+            else if($color_val >= 100) $row["class"] = "lv2";
+
             print json_encode($row, JSON_HEX_APOS | JSON_HEX_QUOT);
             print ",\n";
             $r_limit--;

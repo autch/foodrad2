@@ -4,9 +4,10 @@
     <title>食品の放射能データ検索</title> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0-alpha.2/jquery.mobile-1.4.0-alpha.2.min.css" />
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.4.0-alpha.2/jquery.mobile-1.4.0-alpha.2.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
+    <script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.js"></script>
     <script src="foodrad.js"></script>
     <style>
       #detailPage table { width: 100%; }
@@ -27,7 +28,7 @@
 	<p><span id="timestamp">（取得中...）</span>更新の <a href="reversed.csv">reversed.csv</a> を使用しています。</p>
         <p>検索結果に疑問を抱いたときは <a href="http://oku.edu.mie-u.ac.jp/food/">オリジナル版</a>を参照してください。</p>
 	<br/>
-	<form method="post" action="#resultPage" data-ajax="false" onsubmit="return on_submit();">
+	<form id="searchForm" method="POST" data-ajax="false">
 	  <fieldset>
 	    <ul data-role="listview">
 	      <li data-role="list-divider">
@@ -35,22 +36,22 @@
 	      </li>
 	      <li>
 		<label for="home_pref" class="ui-hidden-accessible">都道府県</label>
-		<input id="home_pref" name="home_pref" size="20" value="" placeholder="都道府県" />
-		<select name="select-home_pref" id="select-home_pref" onchange="$('#home_pref').val($(this).val())">
+		<input id="home_pref" name="home_pref" value="" placeholder="都道府県" />
+		<select name="select-home_pref" id="select-home_pref">
 		  <option value="">すべて</option>
 		</select>
 	      </li>
 	      <li>
 		<label for="category" class="ui-hidden-accessible">食品カテゴリ</label>
-		<input id="category" name="category" size="20" value="" placeholder="食品カテゴリ" />
-		<select name="select-category" id="select-category" onchange="onchange_category()">
+		<input id="category" name="category" value="" placeholder="食品カテゴリ" />
+		<select name="select-category" id="select-category">
 		  <option value="">すべて</option>
 		</select>
 	      </li>
 	      <li>
 		<label for="item_name" class="ui-hidden-accessible">品目</label>
-		<input id="item_name" name="item_name" size="20" value="しいたけ|シイタケ" placeholder="品目" />
-		<select name="select-name" id="select-item_name" onchange="$('#item_name').val($(this).val())">
+		<input id="item_name" name="item_name" value="しいたけ|シイタケ" placeholder="品目" />
+		<select name="select-name" id="select-item_name">
 		  <option value="">すべて</option>
 		</select>
 	      </li>
@@ -61,7 +62,7 @@
 		<label for="cs_total">Cs-134+137 <input id="cs_total" name="cs_total" value="100" /> Bq/kg 以上</label>
 	      </li>
 	      <li>
-		<input type="submit" value="検索" data-theme="b"/>
+		<button>検索</button>
 	      </li>
 	    </ul>
 	  </fieldset>
@@ -111,17 +112,24 @@
 	<p>不検出は &lt; を付けた数値で表しています。この場合の &lt; の右の数値は検出限界値です。</p>
       </div>
     </div>
-<script>
-jQuery(function() {
-    jQuery.mobile.showPageLoadingMsg();
-    jQuery('#submit').attr('disabled', "disabled");
-    get_timestamp();
-});
 
-jQuery(document).delegate('#mainPage', 'pageinit', function() {
-    get_area();
-    get_categories();
-});
-</script>
+    <script id="tmpl-item" type="text/x-handlebars-template">
+      {{#each result}}
+      <li>
+	<a href="#detailPage">
+	  <div class="result-container {{class}}">
+	    <h3>{{[9]}} <small>{{[8]}} {{[10]}}</small></h3>
+	    <p>{{[4]}} {{[5]}}産</p>
+	    <p>{{[13]}}採取、{{[14]}}判明</p>
+	    {{#if with_separate_cs}}
+	    <p>Cs134+137: {{[18]}} (Cs134: {{[16]}}, Cs137: {{[17]}}) [Bq/kg]</p>
+	    {{else}}
+	    <p>Cs134+137: {{[17]}} [Bq/kg]</p>
+	    {{/if}}
+	  </div>
+	</a>
+      </li>
+      {{/each}}
+    </script>
   </body>
 </html>
