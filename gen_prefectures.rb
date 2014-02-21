@@ -10,9 +10,14 @@ JSON_PATH = File.join(dir, "www", "prefectures.js")
 
 PREFECTURES = Hash.new{|h, k| h[k] = 0 }
 
-CSV.foreach(CSV_PATH, encoding: "UTF-8") do |row|
-  key = row[4]
-  PREFECTURES[key] += 1
+File.open(CSV_PATH, "rb:UTF-8") do |file|
+  while line = file.gets do
+    line.chomp!
+    row = line.split(",")
+
+    key = row[4]
+    PREFECTURES[key] += 1
+  end
 end
 
 pref_json = []
