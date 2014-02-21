@@ -91,6 +91,7 @@
 	    }
 
 	    var tmpl_result = jQuery('#tmpl-item').data("template");
+            ul.data("result", result);
 	    ul.html(tmpl_result({ result: result }));
 	    jQuery("#resultPage h1").text(result.length +  "件ヒット");
 	    jQuery.mobile.changePage(jQuery('#resultPage'));
@@ -101,7 +102,9 @@
     });
 
     jQuery(document).on("click", "#resultPage ul li a", function(e) {
-	var data = jQuery(this).data("item");
+        var result = jQuery("#result").data("result");
+	var index = parseInt(jQuery(this).data("index"));
+        var data = result[index];
 	for(var key in data) {
 	    var td = jQuery("#detail-" + key);
 	    if(td && td.length > 0) {

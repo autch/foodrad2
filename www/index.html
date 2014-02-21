@@ -12,7 +12,7 @@
     <style>
       #detailPage table { width: 100%; }
       #detailPage table th { text-align: left; }
-      #detailPage table td.num { text-align: right; }
+      #detailPage table td.num { /* text-align: right; */ }
       #resultPage .result-container { padding-left: 4px; }
       #resultPage .lv2 { border-left: 8px solid #ffc; }
       #resultPage .lv3 { border-left: 8px solid #fc0; }
@@ -116,7 +116,7 @@
     <script id="tmpl-item" type="text/x-handlebars-template">
       {{#each result}}
       <li>
-	<a href="#detailPage">
+	<a href="#detailPage" data-index="{{@index}}">
 	  <div class="result-container {{class}}">
 	    <h3>{{[9]}} <small>{{[8]}} {{[10]}}</small></h3>
 	    <p>{{[4]}} {{[5]}}産</p>
