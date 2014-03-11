@@ -20,5 +20,8 @@ compare_rad($19, CS) {
 	print
 	R_LIMIT = R_LIMIT - 1
     }
+    if(R_LIMIT <= 0) {
+        exit 0
+    }
     R_OFFSET = R_OFFSET - 1
 }
