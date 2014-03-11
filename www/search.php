@@ -15,95 +15,94 @@
 
 setlocale(LC_ALL, 'ja_JP.UTF-8');
 
-function make_pcre_pattern($arg)
-{
-    return sprintf("{%s}", $arg);
+function make_regexp_pattern($arg) {
+    return addcslashes($arg, "\"'");
 }
 
 define('CSV_PATH', "reversed.csv");
+define('AWK', 'awk');
 
 require_once 'jsonp.inc.php';
 
-$where = array();
+$where = array(
+    'area' => '',
+    'category' => '',
+    'name' => '',
+    'i131' => 0,
+    'cs' => 0,
+    'r_limit' => 50,
+    'r_offset' => 0,
+    );
 
 if(!empty($_REQUEST['area']))
-    $where[] = function($row) { return preg_match(make_pcre_pattern($_REQUEST['area']), $row[4]); };
+    $where['area'] = make_regexp_pattern($_REQUEST['area']);
 if(!empty($_REQUEST['category']))
-    $where[] = function($row) { return preg_match(make_pcre_pattern($_REQUEST['category']), $row[8]); };
+    $where['category'] = make_regexp_pattern($_REQUEST['category']);
 if(!empty($_REQUEST['name']))
-    $where[] = function($row) { return preg_match(make_pcre_pattern($_REQUEST['name']), $row[9]); };
+    $where['name'] = make_regexp_pattern($_REQUEST['name']);
+
 if(isset($_REQUEST['I131']))
-{
-    $i131 = floatval($_REQUEST['I131']);
-    if($i131 > 0) {
-        $where[] = function($row) use($i131) { return (strstr($row[15], "<") === FALSE)
-                                    && (floatval($row[15]) >= $i131); };
-    }
-}
+    $where['i131'] = floatval($_REQUEST['I131']);
 if(isset($_REQUEST['Cs']))
-{
-    $cs_total = floatval($_REQUEST['Cs']);
-    if($cs_total > 0) {
-        $where[] = function($row) use($cs_total) { return (strstr($row[18], "<") === FALSE)
-                                    && (floatval($row[18]) >= $cs_total); };
-    }
+    $where['cs'] = floatval($_REQUEST['Cs']);
+
+if(isset($_REQUEST['r_limit'])) {
+    if(($where['r_limit'] = intval($_REQUEST['r_limit'])) < 50)
+        $where['r_limit'] = 50;
 }
 
-$r_limit = 50;
-if(isset($_REQUEST['r_limit']))
-{
-    $r_limit = intval($_REQUEST['r_limit']);
-    if($r_limit < 50)
-    {
-        $r_limit = 50;
-    }
+if(isset($_REQUEST['r_offset'])) {
+    if($where['r_offset'] = intval($_REQUEST['r_offset']) < 0)
+        $where['r_offset'] = 0;
 }
 
-$r_offset = 0;
-if(isset($_REQUEST['r_offset']))
-{
-    $r_offset = intval($_REQUEST['r_offset']);
-    if($r_offset < 0)
-    {
-        $r_offset = 0;
-    }
+$preamble = <<<__EOF__
+BEGIN {
+    I131 = ({$where['i131']}) + 0
+    CS = ({$where['cs']}) + 0
+    R_OFFSET = ({$where['r_offset']}) + 0
+    R_LIMIT = ({$where['r_limit']}) + 0
+    AREA = "{$where['area']}"
+    CATEGORY = "{$where['category']}"
+    NAME = "{$where['name']}"
 }
+__EOF__;
 
-$callback = get_jsonp_callback();
-if(($fp = fopen(CSV_PATH, "rb")) !== FALSE)
+$cmd = sprintf("%s -f - -f search.awk -- %s", AWK, CSV_PATH);
+$ds = array(
+    0 => array("pipe", "r"),
+    1 => array("pipe", "w"),
+    2 => array("file", "awk-errors.log", "a")
+);
+$pipes = array();
+
+if(($proc = proc_open($cmd, $ds, $pipes)) !== FALSE)
 {
     header("Content-Type: application/javascript; charset=UTF-8");
 
+    fwrite($pipes[0], $preamble);
+    fclose($pipes[0]);
+
+    $callback = get_jsonp_callback();
     print jsonp_begin($callback);
     print "[\n";
-    $item_count = 0;
-    while(($row = fgetcsv($fp, 1024)) !== FALSE && $r_limit > 0)
+    while(($row = fgetcsv($pipes[1], 1024)) !== FALSE)
     {
-        $t = TRUE;
-        foreach($where as $fn)
-        {
-            $t = $t && $fn($row);
-        }
-        if($t === FALSE) continue;
+        $row["with_separate_cs"] = (count($row) == 19);
+        $color_val = $row["with_separate_cs"] ? $row[18] : $row[17];
+        if($color_val >= 500)      $row["class"] = "lv3";
+        else if($color_val >= 100) $row["class"] = "lv2";
 
-        if($item_count >= $r_offset && $r_limit > 0)
-        {
-            $row["with_separate_cs"] = (count($row) == 19);
-            $color_val = $row["with_separate_cs"] ? $row[18] : $row[17];
-            if($color_val >= 500)      $row["class"] = "lv3";
-            else if($color_val >= 100) $row["class"] = "lv2";
-
-            print json_encode($row, JSON_HEX_APOS | JSON_HEX_QUOT);
-            print ",\n";
-            $r_limit--;
-        }
-        $item_count++;
+        print json_encode($row, JSON_HEX_APOS | JSON_HEX_QUOT);
+        print ",\n";
     }
     print "]";
     print jsonp_end($callback);
     print "\n";
 
-    fclose($fp);
+    fclose($pipes[1]);
+
+    proc_close($proc);
 }
 else
 {
