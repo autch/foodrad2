@@ -3,5 +3,6 @@ prefectures.js
 reversed.csv
 reversed.csv.gz
 timestamp.txt
-
+timestamp.tmp
+www/awk-errors.log
 
