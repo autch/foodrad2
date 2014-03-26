@@ -30,7 +30,7 @@ $where = array(
     'name' => '',
     'i131' => 0,
     'cs' => 0,
-    'r_limit' => 100,
+    'r_limit' => 50,
     'r_offset' => 0,
     );
 
@@ -47,8 +47,8 @@ if(isset($_REQUEST['Cs']))
     $where['cs'] = floatval($_REQUEST['Cs']);
 
 if(isset($_REQUEST['r_limit'])) {
-    if(($where['r_limit'] = intval($_REQUEST['r_limit'])) < 100)
-        $where['r_limit'] = 100;
+    if(($where['r_limit'] = intval($_REQUEST['r_limit'])) < 50)
+        $where['r_limit'] = 50;
 }
 
 if(isset($_REQUEST['r_offset'])) {

@@ -16,12 +16,12 @@ $9 ~ CATEGORY && # category
 $10 ~ NAME && # name
 compare_rad($16, I131) &&
 compare_rad($19, CS) {
-    if(R_OFFSET <= 0 && R_LIMIT > 0) {
+    if(R_OFFSET <= 0 && (R_LIMIT == -1 || R_LIMIT > 0)) {
 	print
-	R_LIMIT = R_LIMIT - 1
+	if(R_LIMIT != -1) R_LIMIT--
     }
-    if(R_LIMIT <= 0) {
+    if(R_LIMIT == 0) {
         exit 0
     }
-    R_OFFSET = R_OFFSET - 1
+    R_OFFSET--
 }
